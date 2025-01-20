@@ -1,7 +1,8 @@
 // static/js/script.js
 
 
-// variable name mapping
+
+// Variable name mapping
 const latexNames = {
     'I': 'I',
     'i': 'i',
@@ -12,7 +13,9 @@ const latexNames = {
     't': 't',
     't_prime': "t'",
     'G_fq': 'G_{fq}',
-    'g_fq': 'g_{fq}'
+    'g_fq': 'g_{fq}',
+    'beta_L': '\\beta_L',
+    'L': 'L'
 };
 
 function formatScientific(num) {
@@ -31,9 +34,10 @@ async function updateConstants() {
 
         const constants = {
             I_c: parseFloat(document.getElementById('I_c').value),
-            r_jj: parseFloat(document.getElementById('r_jj').value),
+            L: parseFloat(document.getElementById('L').value),
             r_leak: parseFloat(document.getElementById('r_leak').value),
-            L: parseFloat(document.getElementById('L').value)
+            gamma_c: parseFloat(document.getElementById('gamma_c').value),
+            beta_c: parseFloat(document.getElementById('beta_c').value)
         };
 
         const response = await fetch('/update_constants', {
@@ -45,7 +49,7 @@ async function updateConstants() {
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
 
-        // derived constants display
+        // Update derived constants display
         Object.keys(data).forEach(key => {
             const element = document.getElementById(key);
             if (element) {
@@ -74,7 +78,8 @@ async function convertToPhysical() {
             phi: parseFloat(document.getElementById('phi').value),
             J: parseFloat(document.getElementById('J').value),
             t_prime: parseFloat(document.getElementById('t_prime').value),
-            g_fq: parseFloat(document.getElementById('g_fq').value)
+            g_fq: parseFloat(document.getElementById('g_fq').value),
+            beta_L: parseFloat(document.getElementById('beta_L').value)
         };
 
         const response = await fetch('/convert_to_physical', {
@@ -110,7 +115,8 @@ async function convertToDimensionless() {
             Phi: parseFloat(document.getElementById('Phi').value),
             M: parseFloat(document.getElementById('M').value),
             t: parseFloat(document.getElementById('t').value),
-            G_fq: parseFloat(document.getElementById('G_fq').value)
+            G_fq: parseFloat(document.getElementById('G_fq').value),
+            L: parseFloat(document.getElementById('L').value)
         };
 
         const response = await fetch('/convert_to_dimensionless', {
