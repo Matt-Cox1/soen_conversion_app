@@ -1,5 +1,6 @@
 # FILEPATH: soen/utils/physical_mappings/soen_conversion_utils.py
 
+
 import math
 import argparse
 from scipy.constants import h, e
@@ -16,15 +17,17 @@ class PhysicalConverter:
         r_jj (float): Junction shunt resistance in ohms
         omega_c (float): Characteristic frequency in rad/s
         alpha (float): Resistance ratio (dimensionless)
-        beta (float): Dimensionless inductance
+        beta_L (float): Dimensionless inductance
         gamma (float): Inverse dimensionless inductance
         tau (float): Dimensionless time constant
+        gamma_c (float): Proportionality between capacitance and Ic (units of farads per amp)
+        beta_c (float): Dimensionless parameter related to the junction
     """
     
     # Fixed constant
     Phi_0 = h / (2 * e)  # Magnetic flux quantum in weber
     
-    def __init__(self, I_c=100e-6, L=1e-9, r_leak=1.0, r_jj=2.56):
+    def __init__(self, I_c=100e-6, L=1e-9, r_leak=1.0, r_jj=2.56, gamma_c=1.5e-9, beta_c=1.0):
         """
         Initializes the PhysicalConverter with given physical parameters.
         
@@ -33,18 +36,23 @@ class PhysicalConverter:
             L (float): Inductance in henries
             r_leak (float): Leak resistance in ohms
             r_jj (float): Junction shunt resistance in ohms
+            gamma_c (float): Proportionality between capacitance and Ic (units of farads per amp)
+            beta_c (float): Dimensionless parameter related to the junction
         """
         self.I_c = I_c
         self.r_jj = r_jj
         self.L = L
         self.r_leak = r_leak
+        self.gamma_c = gamma_c
+        self.beta_c = beta_c
         
         # Calculate derived quantities
         self.omega_c = self.calculate_omega_c()
         self.alpha = self.calculate_alpha()
-        self.beta = self.calculate_beta()
+        self.beta_L = self.calculate_beta_L()
         self.gamma = self.calculate_gamma()
         self.tau = self.calculate_tau()
+        self.jj_params = self.get_jj_params()
 
     def calculate_omega_c(self):
         """Calculates characteristic frequency ωc = 2πrjjIc/Φ0"""
@@ -54,17 +62,28 @@ class PhysicalConverter:
         """Calculates resistance ratio α = rleak/rjj"""
         return self.r_leak / self.r_jj
 
-    def calculate_beta(self):
-        """Calculates dimensionless inductance β = 2πLIc/Φ0"""
+    def calculate_beta_L(self):
+        """Calculates dimensionless inductance β_L = 2πLIc/Φ0"""
         return (2 * math.pi * self.L * self.I_c) / self.Phi_0
 
     def calculate_gamma(self):
-        """Calculates inverse dimensionless inductance γ = 1/β"""
-        return 1 / self.beta
+        """Calculates inverse dimensionless inductance γ = 1/β_L"""
+        return 1 / self.beta_L
 
     def calculate_tau(self):
-        """Calculates dimensionless time constant τ = β/α"""
-        return self.beta / self.alpha
+        """Calculates dimensionless time constant τ = β_L/α"""
+        return self.beta_L / self.alpha
+
+    def get_jj_params(self):
+        """Calculates JJ parameters based on Ic and beta_c"""
+        c_j = self.gamma_c * self.I_c  # JJ capacitance
+        r_jj = math.sqrt((self.beta_c * self.Phi_0) / (2 * math.pi * c_j * self.I_c))
+        tau_0 = self.Phi_0 / (2 * math.pi * self.I_c * r_jj)
+        V_j = self.I_c * r_jj
+        omega_c = 2 * math.pi * self.I_c * r_jj / self.Phi_0
+        omega_p = math.sqrt(2 * math.pi * self.I_c / (self.Phi_0 * c_j))
+        
+        return {'c_j': c_j, 'r_jj': r_jj, 'tau_0': tau_0, 'Ic': self.I_c, 'beta_c': self.beta_c, 'gamma_c': self.gamma_c, 'V_j': V_j, 'omega_c': omega_c, 'omega_p': omega_p}
 
     def physical_to_dimensionless_current(self, I):
         """Converts physical current to dimensionless (i = I/Ic)"""
@@ -112,6 +131,8 @@ def main():
     parser.add_argument('--r_jj', type=float, default=2.56, help="Junction shunt resistance [Ω]")
     parser.add_argument('--L', type=float, default=1e-9, help="Inductance [H]")
     parser.add_argument('--r_leak', type=float, default=1.0, help="Leak resistance [Ω]")
+    parser.add_argument('--gamma_c', type=float, default=1.5e-9, help="Proportionality between capacitance and Ic [F/A]")
+    parser.add_argument('--beta_c', type=float, default=1.0, help="Dimensionless parameter related to the junction")
     
     # Add arguments for dimensionless quantities
     parser.add_argument('--i', type=float, help="Dimensionless current")
@@ -126,16 +147,23 @@ def main():
         I_c=args.I_c,
         r_jj=args.r_jj,
         L=args.L,
-        r_leak=args.r_leak
+        r_leak=args.r_leak,
+        gamma_c=args.gamma_c,
+        beta_c=args.beta_c
     )
     
     # Print derived quantities
     print("\nDerived Quantities:")
     print(f"ωc = {converter.omega_c:.2e} rad/s")
     print(f"α = {converter.alpha:.2e}")
-    print(f"β = {converter.beta:.2e}")
+    print(f"β_L = {converter.beta_L:.2e}")
     print(f"γ = {converter.gamma:.2e}")
     print(f"τ = {converter.tau:.2e}")
+    
+    # Print JJ parameters
+    print("\nJJ Parameters:")
+    for key, value in converter.jj_params.items():
+        print(f"{key} = {value:.2e}")
     
     # Convert and print requested values
     print("\nConversions:")
