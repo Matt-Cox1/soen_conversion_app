@@ -1,6 +1,7 @@
 // static/js/script.js
 
-// Add variable name mapping
+
+// variable name mapping
 const latexNames = {
     'I': 'I',
     'i': 'i',
@@ -32,8 +33,7 @@ async function updateConstants() {
             I_c: parseFloat(document.getElementById('I_c').value),
             r_jj: parseFloat(document.getElementById('r_jj').value),
             r_leak: parseFloat(document.getElementById('r_leak').value),
-            L: parseFloat(document.getElementById('L').value),
-            Phi_0: parseFloat(document.getElementById('Phi_0').value)
+            L: parseFloat(document.getElementById('L').value)
         };
 
         const response = await fetch('/update_constants', {
@@ -45,7 +45,7 @@ async function updateConstants() {
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
 
-        // Update derived constants display
+        // derived constants display
         Object.keys(data).forEach(key => {
             const element = document.getElementById(key);
             if (element) {
