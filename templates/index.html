@@ -1,4 +1,5 @@
 <!-- templates/index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +47,7 @@
                     <input id="t_prime" type="number" step="any">
                 </div>
                 <div class="input-group">
-                    <label for="g_fq">Dimensionless Flux Quantum Rate (g_fq)</label>
+                    <label for="g_fq">Dimensionless Flux Quantum Rate (g_{fq})</label>
                     <input id="g_fq" type="number" step="any">
                 </div>
                 <button onclick="convertToPhysical()" class="convert-physical-btn">Convert to Physical Units</button>
@@ -73,10 +74,10 @@
                     <input id="t" type="number" step="any">
                 </div>
                 <div class="input-group">
-                    <label for="G_fq">Physical Flux Quantum Rate (G_fq) [Hz]</label>
+                    <label for="G_fq">Physical Flux Quantum Rate (G_{fq}) [Hz]</label>
                     <input id="G_fq" type="number" step="any">
                 </div>
-                <button onclick="convertToDimensionless()">Convert to Dimensionless Units</button>
+                <button onclick="convertToDimensionless()" class="convert-dimensionless-btn">Convert to Dimensionless Units</button>
                 <div id="dimensionlessResult" class="result"></div>
             </div>
 
