@@ -1,5 +1,6 @@
 <!-- templates/index.html -->
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,6 +105,9 @@
                         <p>\[\beta = \frac{2\pi L I_c}{\Phi_0}\]</p>
                         <p>\[\gamma = \frac{1}{\beta}\]</p>
                         <p>\[\tau = \frac{\beta}{\alpha}\]</p>
+
+                        <h3>Fixed Constants</h3>
+                        <p>\[\Phi_0 = \frac{h}{2e} \approx 2.07 \times 10^{-15} \, \text{Wb}\]</p>
                     </div>
                 </div>
 
@@ -121,10 +125,6 @@
                         <div class="input-group">
                             <label for="L">Inductance (L) [H]</label>
                             <input id="L" type="number" step="any" value="1e-9">
-                        </div>
-                        <div class="input-group">
-                            <label for="Phi_0">Flux Quantum (Φ₀) [Wb]</label>
-                            <input id="Phi_0" type="number" step="any" value="2.07e-15">
                         </div>
                         <div class="input-group">
                             <label for="r_leak">Leak Resistance (r_{leak}) [Ω]</label>
