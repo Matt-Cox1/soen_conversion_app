@@ -1,5 +1,6 @@
 # src/soen/utils/physical_mappings/main.py
 
+
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from soen_conversion_utils import PhysicalConverter
 
@@ -51,15 +52,15 @@ def convert_to_physical():
     data = request.json
     result = {}
     
-    if 'i' in data:
+    if 'i' in data and data['i'] is not None:
         result['I'] = converter.dimensionless_to_physical_current(data['i'])
-    if 'phi' in data:
+    if 'phi' in data and data['phi'] is not None:
         result['Phi'] = converter.dimensionless_to_physical_flux(data['phi'])
-    if 'J' in data:
+    if 'J' in data and data['J'] is not None:
         result['M'] = converter.dimensionless_to_physical_inductance(data['J'])
-    if 't_prime' in data:
+    if 't_prime' in data and data['t_prime'] is not None:
         result['t'] = converter.dimensionless_to_physical_time(data['t_prime'])
-    if 'g_fq' in data:
+    if 'g_fq' in data and data['g_fq'] is not None:
         result['G_fq'] = converter.dimensionless_to_physical_fq_rate(data['g_fq'])
 
     return jsonify(result)
@@ -69,15 +70,15 @@ def convert_to_dimensionless():
     data = request.json
     result = {}
     
-    if 'I' in data:
+    if 'I' in data and data['I'] is not None:
         result['i'] = converter.physical_to_dimensionless_current(data['I'])
-    if 'Phi' in data:
+    if 'Phi' in data and data['Phi'] is not None:
         result['phi'] = converter.physical_to_dimensionless_flux(data['Phi'])
-    if 'M' in data:
+    if 'M' in data and data['M'] is not None:
         result['J'] = converter.physical_to_dimensionless_inductance(data['M'])
-    if 't' in data:
+    if 't' in data and data['t'] is not None:
         result['t_prime'] = converter.physical_to_dimensionless_time(data['t'])
-    if 'G_fq' in data:
+    if 'G_fq' in data and data['G_fq'] is not None:
         result['g_fq'] = converter.physical_to_dimensionless_fq_rate(data['G_fq'])
 
     return jsonify(result)
