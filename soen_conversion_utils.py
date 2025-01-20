@@ -1,8 +1,8 @@
 # FILEPATH: soen/utils/physical_mappings/soen_conversion_utils.py
 
-
 import math
 import argparse
+from scipy.constants import h, e
 
 class PhysicalConverter:
     """
@@ -11,7 +11,7 @@ class PhysicalConverter:
     Attributes:
         I_c (float): Critical current in amperes
         L (float): Inductance in henries
-        Phi_0 (float): Magnetic flux quantum in weber
+        Phi_0 (float): Magnetic flux quantum in weber (fixed constant)
         r_leak (float): Leak resistance in ohms
         r_jj (float): Junction shunt resistance in ohms
         omega_c (float): Characteristic frequency in rad/s
@@ -21,21 +21,22 @@ class PhysicalConverter:
         tau (float): Dimensionless time constant
     """
     
-    def __init__(self, I_c=100e-6, L=1e-9, Phi_0=2.07e-15, r_leak=1.0,r_jj=2.56):
+    # Fixed constant
+    Phi_0 = h / (2 * e)  # Magnetic flux quantum in weber
+    
+    def __init__(self, I_c=100e-6, L=1e-9, r_leak=1.0, r_jj=2.56):
         """
         Initializes the PhysicalConverter with given physical parameters.
         
         Args:
             I_c (float): Critical current in amperes
             L (float): Inductance in henries
-            Phi_0 (float): Magnetic flux quantum in weber
             r_leak (float): Leak resistance in ohms
             r_jj (float): Junction shunt resistance in ohms
         """
         self.I_c = I_c
         self.r_jj = r_jj
         self.L = L
-        self.Phi_0 = Phi_0
         self.r_leak = r_leak
         
         # Calculate derived quantities
@@ -110,7 +111,6 @@ def main():
     parser.add_argument('--I_c', type=float, default=100e-6, help="Critical current [A]")
     parser.add_argument('--r_jj', type=float, default=2.56, help="Junction shunt resistance [Ω]")
     parser.add_argument('--L', type=float, default=1e-9, help="Inductance [H]")
-    parser.add_argument('--Phi_0', type=float, default=2.07e-15, help="Magnetic flux quantum [Wb]")
     parser.add_argument('--r_leak', type=float, default=1.0, help="Leak resistance [Ω]")
     
     # Add arguments for dimensionless quantities
@@ -126,7 +126,6 @@ def main():
         I_c=args.I_c,
         r_jj=args.r_jj,
         L=args.L,
-        Phi_0=args.Phi_0,
         r_leak=args.r_leak
     )
     
