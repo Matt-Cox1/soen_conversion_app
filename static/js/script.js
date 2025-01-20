@@ -1,7 +1,5 @@
 // static/js/script.js
 
-
-
 function formatScientific(num) {
     if (num === undefined || num === null) return '';
     const str = num.toExponential(4);
@@ -9,8 +7,6 @@ function formatScientific(num) {
     exp = parseInt(exp);
     return `${coef} \\times 10^{${exp}}`;
 }
-
-
 
 async function updateConstants() {
     const button = document.querySelector('.update-constants-btn');
@@ -77,7 +73,7 @@ async function convertToPhysical() {
         const resultData = await response.json();
 
         result.innerHTML = Object.entries(resultData)
-            .map(([key, value]) => `\\[${key} = ${formatScientific(value)}\\]`)
+            .map(([key, value]) => `\\[${key.replace(/_/g, '_{').replace(/$/, '}')} = ${formatScientific(value)}\\]`)
             .join('\n');
 
         MathJax.typeset([result]);
@@ -113,7 +109,7 @@ async function convertToDimensionless() {
         const resultData = await response.json();
 
         result.innerHTML = Object.entries(resultData)
-            .map(([key, value]) => `\\[${key} = ${formatScientific(value)}\\]`)
+            .map(([key, value]) => `\\[${key.replace(/_/g, '_{').replace(/$/, '}')} = ${formatScientific(value)}\\]`)
             .join('\n');
 
         MathJax.typeset([result]);
