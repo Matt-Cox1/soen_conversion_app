@@ -1,6 +1,7 @@
 # src/soen/utils/physical_mappings/main.py
 
 
+
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from soen_conversion_utils import PhysicalConverter
 
@@ -19,16 +20,30 @@ def send_static(path):
 def update_constants():
     data = request.json
     try:
-        converter.I_c = float(data.get('I_c', converter.I_c))
-        converter.r_jj = float(data.get('r_jj', converter.r_jj))
-        converter.r_leak = float(data.get('r_leak', converter.r_leak))
-        converter.L = float(data.get('L', converter.L))
-        converter.Phi_0 = float(data.get('Phi_0', converter.Phi_0))
+        I_c = data.get('I_c')
+        r_jj = data.get('r_jj')
+        r_leak = data.get('r_leak')
+        L = data.get('L')
+        gamma_c = data.get('gamma_c')
+        beta_c = data.get('beta_c')
+
+        if I_c is not None:
+            converter.I_c = float(I_c)
+        if r_jj is not None:
+            converter.r_jj = float(r_jj)
+        if r_leak is not None:
+            converter.r_leak = float(r_leak)
+        if L is not None:
+            converter.L = float(L)
+        if gamma_c is not None:
+            converter.gamma_c = float(gamma_c)
+        if beta_c is not None:
+            converter.beta_c = float(beta_c)
 
         # Recalculate derived quantities
         converter.omega_c = converter.calculate_omega_c()
         converter.alpha = converter.calculate_alpha()
-        converter.beta = converter.calculate_beta()
+        converter.beta_L = converter.calculate_beta_L()
         converter.gamma = converter.calculate_gamma()
         converter.tau = converter.calculate_tau()
 
@@ -37,15 +52,16 @@ def update_constants():
             'r_jj': converter.r_jj,
             'r_leak': converter.r_leak,
             'L': converter.L,
-            'Phi_0': converter.Phi_0,
+            'gamma_c': converter.gamma_c,
+            'beta_c': converter.beta_c,
             'omega_c': converter.omega_c,
             'alpha': converter.alpha,
-            'beta': converter.beta,
+            'beta_L': converter.beta_L,
             'gamma': converter.gamma,
             'tau': converter.tau
         })
-    except ValueError as e:
-        return jsonify({'error': 'Invalid input values'}), 400
+    except (ValueError, TypeError) as e:
+        return jsonify({'error': f'Invalid input values: {str(e)}'}), 400
 
 @app.route('/convert_to_physical', methods=['POST'])
 def convert_to_physical():
@@ -62,6 +78,8 @@ def convert_to_physical():
         result['t'] = converter.dimensionless_to_physical_time(data['t_prime'])
     if 'g_fq' in data and data['g_fq'] is not None:
         result['G_fq'] = converter.dimensionless_to_physical_fq_rate(data['g_fq'])
+    if 'beta_L' in data and data['beta_L'] is not None:
+        result['L'] = converter.dimensionless_to_physical_inductance(data['beta_L'])
 
     return jsonify(result)
 
@@ -80,6 +98,8 @@ def convert_to_dimensionless():
         result['t_prime'] = converter.physical_to_dimensionless_time(data['t'])
     if 'G_fq' in data and data['G_fq'] is not None:
         result['g_fq'] = converter.physical_to_dimensionless_fq_rate(data['G_fq'])
+    if 'L' in data and data['L'] is not None:
+        result['beta_L'] = converter.physical_to_dimensionless_inductance(data['L'])
 
     return jsonify(result)
 
