@@ -1,5 +1,19 @@
 // static/js/script.js
 
+// Add variable name mapping
+const latexNames = {
+    'I': 'I',
+    'i': 'i',
+    'Phi': '\\Phi',
+    'phi': '\\phi',
+    'M': 'M',
+    'J': 'J',
+    't': 't',
+    't_prime': "t'",
+    'G_fq': 'G_{fq}',
+    'g_fq': 'g_{fq}'
+};
+
 function formatScientific(num) {
     if (num === undefined || num === null) return '';
     const str = num.toExponential(4);
@@ -73,7 +87,7 @@ async function convertToPhysical() {
         const resultData = await response.json();
 
         result.innerHTML = Object.entries(resultData)
-            .map(([key, value]) => `\\[${key.replace(/_/g, '_{').replace(/$/, '}')} = ${formatScientific(value)}\\]`)
+            .map(([key, value]) => `\\[${latexNames[key]} = ${formatScientific(value)}\\]`)
             .join('\n');
 
         MathJax.typeset([result]);
@@ -109,7 +123,7 @@ async function convertToDimensionless() {
         const resultData = await response.json();
 
         result.innerHTML = Object.entries(resultData)
-            .map(([key, value]) => `\\[${key.replace(/_/g, '_{').replace(/$/, '}')} = ${formatScientific(value)}\\]`)
+            .map(([key, value]) => `\\[${latexNames[key]} = ${formatScientific(value)}\\]`)
             .join('\n');
 
         MathJax.typeset([result]);
