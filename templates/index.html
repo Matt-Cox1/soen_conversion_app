@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversion Tool: Real-Dimensionless</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined']
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --bg-color: #f5f6fa;
+            --input-bg: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .converter-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 5px;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.5;
+        }
+
+        .equations {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            background-color: #95a5a6 !important;
+            cursor: wait !important;
+        }
+
+        .tab-container {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            width: auto;
+            color: var(--primary-color); /* Ensure text is always visible */
+            margin: 0; /* Remove margin-right and use gap in container instead */
+        }
+
+        .tab-button:hover {
+            background-color: rgba(52, 152, 219, 0.1); /* Light blue background on hover */
+        }
+
+        .tab-button.active {
+            border-bottom: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .constants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .derived-constants {
+            grid-column: 1 / -1;
+            background-color: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+
+        .derived-constants p {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .update-constants-btn {
+            grid-column: 1 / -1;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+
+    <body>
+        <div class="container">
+            <h1>SOEN Conversion Tool: Real-Dimensionless</h1>
+            <div class="converter-grid">
+                <!-- Convert to Physical Section -->
+                <div class="converter-section">
+                    <h2>Convert to Physical</h2>
+                    <div class="input-group">
+                        <label for="i">Dimensionless Current (i)</label>
+                        <input id="i" type="number" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="phi">Dimensionless Flux (φ)</label>
+                        <input id="phi" type="number" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="J">Dimensionless Inductance (J)</label>
+                        <input id="J" type="number" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="t_prime">Dimensionless Time (t')</label>
+                        <input id="t_prime" type="number" step="any">
+                    </div>
+                    <button onclick="convertToPhysical()">Convert to Physical Units</button>
+                    <div id="physicalResult" class="result"></div>
+                </div>
+
+                <!-- Convert to Abstract Section -->
+                <div class="converter-section">
+                    <h2>Convert to Abstract</h2>
+                    <div class="input-group">
+                        <label for="I">Physical Current (I) [A]</label>
+                        <input id="I" type="number" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="flux">Physical Flux (Φ) [Wb]</label>
+                        <input id="flux" type="number" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="M">Physical Mutual Inductance (M) [H]</label>
+                        <input id="M" type="number" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="t">Physical Time (t) [s]</label>
+                        <input id="t" type="number" step="any">
+                    </div>
+                    <button onclick="convertToAbstract()">Convert to Abstract Units</button>
+                    <div id="abstractResult" class="result"></div>
+                </div>
+
+                <!-- Tabbed Section -->
+                <div class="equations">
+                    <div class="tab-container">
+                        <button class="tab-button active" onclick="switchTab('equations-tab')">Equations</button>
+                        <button class="tab-button" onclick="switchTab('constants-tab')">Constants</button>
+                    </div>
+                        <div id="equations-tab" class="tab-content active">
+                            <h2>Equations</h2>
+                            <div id="equations">
+                                <h3>Convert to Physical</h3>
+                                <p>\[I = i \cdot I_c\]</p>
+                                <p>\[\Phi = \phi \cdot \Phi_0\]</p>
+                                <p>\[M = J \cdot \frac{\Phi_0}{I_c}\]</p>
+                                <p>\[t = \frac{t'}{\omega_c}\]</p>
+
+                                <h3>Convert to Abstract</h3>
+                                <p>\[i = \frac{I}{I_c}\]</p>
+                                <p>\[\phi = \frac{\Phi}{\Phi_0}\]</p>
+                                <p>\[J = M \cdot \frac{I_c}{\Phi_0}\]</p>
+                                <p>\[t' = t \cdot \omega_c\]</p>
+
+                                <h3>Derived Quantities</h3>
+                                <p>\[\omega_c = \frac{2\pi R I_c}{\Phi_0}\]</p>
+                                <p>\[\alpha = \frac{R_{leak}}{R_{jj}}\]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="constants-tab" class="tab-content">
+                        <h2>Physical Constants</h2>
+                        <div class="constants-grid">
+                            <div class="input-group">
+                                <label for="I_c">Critical Current (I_c) [A]</label>
+                                <input id="I_c" type="number" step="any" value="100e-6">
+                            </div>
+                            <div class="input-group">
+                                <label for="R">Shunt Resistance (R_{jj}) [Ω]</label>
+                                <input id="R" type="number" step="any" value="2.56">
+                            </div>
+                            <div class="input-group">
+                                <label for="L">Inductance (L) [H]</label>
+                                <input id="L" type="number" step="any" value="1e-9">
+                            </div>
+                            <div class="input-group">
+                                <label for="C">Capacitance (C) [F]</label>
+                                <input id="C" type="number" step="any" value="0.151e-12">
+                            </div>
+                            <div class="input-group">
+                                <label for="Phi_0">Flux Quantum (Φ₀) [Wb]</label>
+                                <input id="Phi_0" type="number" step="any" value="2.07e-15">
+                            </div>
+                            <div class="input-group">
+                                <label for="R_leak">Leak Resistance (R_leak) [Ω]</label>
+                                <input id="R_leak" type="number" step="any" value="1.0">
+                            </div>
+                            
+                            <div class="derived-constants">
+                                    <h3>Derived Constants</h3>
+                                    <p>\[\omega_c = \]<span id="omega_c"></span> \[\text{ rad/s}\]</p>
+                                    <p>\[\alpha = \]<span id="alpha"></span></p>
+                                </div>
+                            <button onclick="updateConstants()" class="update-constants-btn">Update Constants</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function formatScientific(num) {
+                if (num === undefined || num === null) return '';
+
+                const str = num.toExponential(4);
+                let [coef, exp] = str.split('e');
+                exp = parseInt(exp);
+
+                return `${coef} \\times 10^{${exp}}`;
+            }
+
+            function switchTab(tabId) {
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.classList.remove('active');
+                });
+
+                document.getElementById(tabId).classList.add('active');
+                event.target.classList.add('active');
+            }
+
+
+
+
+            async function updateConstants() {
+                const button = document.querySelector('.update-constants-btn');
+                try {
+                    button.classList.add('loading');
+                    button.textContent = 'Updating...';
+
+                    const constants = {
+                        I_c: parseFloat(document.getElementById('I_c').value),
+                        R: parseFloat(document.getElementById('R').value),
+                        L: parseFloat(document.getElementById('L').value),
+                        C: parseFloat(document.getElementById('C').value),
+                        Phi_0: parseFloat(document.getElementById('Phi_0').value),
+                        R_leak: parseFloat(document.getElementById('R_leak').value)
+                    };
+
+                    const response = await fetch('/update_constants', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(constants)
+                    });
+
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+
+                    // Update derived constants with LaTeX formatting
+                    document.getElementById('omega_c').innerHTML = formatScientific(data.omega_c);
+                    document.getElementById('alpha').innerHTML = formatScientific(data.alpha);
+
+                    // Retypeset the derived constants section
+                    MathJax.typeset([document.querySelector('.derived-constants')]);
+
+                    alert('Constants updated successfully!');
+                } catch (error) {
+                    alert('Error updating constants: ' + error.message);
+                } finally {
+                    button.classList.remove('loading');
+                    button.textContent = 'Update Constants';
+                }
+            }
+
+
+            async function convertToPhysical() {
+                const button = document.querySelector('button');
+                const result = document.getElementById('physicalResult');
+                try {
+                    button.classList.add('loading');
+                    button.textContent = 'Converting...';
+
+                    const i = parseFloat(document.getElementById('i').value);
+                    const phi = parseFloat(document.getElementById('phi').value);
+                    const J = parseFloat(document.getElementById('J').value);
+                    const t_prime = parseFloat(document.getElementById('t_prime').value);
+
+                    const response = await fetch('/convert_to_physical', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ i, phi, J, t_prime }),
+                    });
+
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+
+                    result.innerHTML = `
+                        <p>\\[I = ${formatScientific(data.I)} \\,\\text{A}\\]</p>
+                        <p>\\[\\Phi = ${formatScientific(data.flux)} \\,\\text{Wb}\\]</p>
+                        <p>\\[M = ${formatScientific(data.M)} \\,\\text{H}\\]</p>
+                        <p>\\[t = ${formatScientific(data.t)} \\,\\text{s}\\]</p>
+                    `;
+                    MathJax.typeset([result]);
+                } catch (error) {
+                    result.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+                } finally {
+                    button.classList.remove('loading');
+                    button.textContent = 'Convert to Physical Units';
+                }
+            }
+
+            async function convertToAbstract() {
+                const button = document.querySelectorAll('button')[1];
+                const result = document.getElementById('abstractResult');
+                try {
+                    button.classList.add('loading');
+                    button.textContent = 'Converting...';
+
+                    const I = parseFloat(document.getElementById('I').value);
+                    const flux = parseFloat(document.getElementById('flux').value);
+                    const M = parseFloat(document.getElementById('M').value);
+                    const t = parseFloat(document.getElementById('t').value);
+
+                    const response = await fetch('/convert_to_abstract', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ I, flux, M, t }),
+                    });
+
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+
+                    result.innerHTML = `
+                        <p>\\[i = ${formatScientific(data.i)}\\]</p>
+                        <p>\\[\\phi = ${formatScientific(data.phi)}\\]</p>
+                        <p>\\[J = ${formatScientific(data.J)}\\]</p>
+                        <p>\\[t' = ${formatScientific(data.t_prime)}\\]</p>
+                    `;
+                    MathJax.typeset([result]);
+                } catch (error) {
+                    result.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+                } finally {
+                    button.classList.remove('loading');
+                    button.textContent = 'Convert to Abstract Units';
+                }
+            }
+
+            // Initial MathJax typeset and constants load
+            MathJax.startup.ready.then(() => {
+                MathJax.typeset();
+                updateConstants();
+            });
+        </script>
+    </body>
+    </html>
