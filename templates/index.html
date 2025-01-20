@@ -1,6 +1,5 @@
 <!-- templates/index.html -->
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,6 +50,10 @@
                     <label for="g_fq">Dimensionless Flux Quantum Rate (g_{fq})</label>
                     <input id="g_fq" type="number" step="any">
                 </div>
+                <div class="input-group">
+                    <label for="beta_L">Dimensionless Inductance (β_L)</label>
+                    <input id="beta_L" type="number" step="any">
+                </div>
                 <button onclick="convertToPhysical()" class="convert-physical-btn">Convert to Physical Units</button>
                 <div id="physicalResult" class="result"></div>
             </div>
@@ -78,6 +81,10 @@
                     <label for="G_fq">Physical Flux Quantum Rate (G_{fq}) [Hz]</label>
                     <input id="G_fq" type="number" step="any">
                 </div>
+                <div class="input-group">
+                    <label for="L">Inductance (L) [H]</label>
+                    <input id="L" type="number" step="any">
+                </div>
                 <button onclick="convertToDimensionless()" class="convert-dimensionless-btn">Convert to Dimensionless Units</button>
                 <div id="dimensionlessResult" class="result"></div>
             </div>
@@ -102,9 +109,8 @@
                         <h3>Derived Quantities</h3>
                         <p>\[\omega_c = \frac{2\pi r_{jj} I_c}{\Phi_0}\]</p>
                         <p>\[\alpha = \frac{r_{leak}}{r_{jj}}\]</p>
-                        <p>\[\beta = \frac{2\pi L I_c}{\Phi_0}\]</p>
-                        <p>\[\gamma = \frac{1}{\beta}\]</p>
-                        <p>\[\tau = \frac{\beta}{\alpha}\]</p>
+                        <p>\[\gamma = \frac{1}{\beta_L}\]</p>
+                        <p>\[\tau = \frac{\beta_L}{\alpha}\]</p>
 
                         <h3>Fixed Constants</h3>
                         <p>\[\Phi_0 = \frac{h}{2e} \approx 2.07 \times 10^{-15} \, \text{Wb}\]</p>
@@ -130,6 +136,14 @@
                             <label for="r_leak">Leak Resistance (r_{leak}) [Ω]</label>
                             <input id="r_leak" type="number" step="any" value="1.0">
                         </div>
+                        <div class="input-group">
+                            <label for="gamma_c">Proportionality Constant (γ_c) [F/A]</label>
+                            <input id="gamma_c" type="number" step="any" value="1.5e-9">
+                        </div>
+                        <div class="input-group">
+                            <label for="beta_c">Dimensionless Damping (β_c)</label>
+                            <input id="beta_c" type="number" step="any" value="1.0">
+                        </div>
                         
                         <div class="derived-constants">
                             <h3>Derived Constants</h3>
@@ -138,9 +152,6 @@
                             </div>
                             <div class="constant-item">
                                 <span>α = </span><span id="alpha"></span>
-                            </div>
-                            <div class="constant-item">
-                                <span>β = </span><span id="beta"></span>
                             </div>
                             <div class="constant-item">
                                 <span>γ = </span><span id="gamma"></span>
