@@ -1,9 +1,9 @@
-# src/soen/utils/physical_mappings/main.py
-
+# 0.3
 
 
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from soen_conversion_utils import PhysicalConverter
+import math
 
 app = Flask(__name__)
 converter = PhysicalConverter()
@@ -20,17 +20,20 @@ def send_static(path):
 def update_constants():
     data = request.json
     try:
+        # Get input parameters
         I_c = data.get('I_c')
-        r_jj = data.get('r_jj')
         r_leak = data.get('r_leak')
         L = data.get('L')
         gamma_c = data.get('gamma_c')
         beta_c = data.get('beta_c')
 
+        # Validate inputs
+        if any(x is not None and float(x) <= 0 for x in [I_c, r_leak, L, gamma_c, beta_c]):
+            return jsonify({'error': 'All parameters must be positive'}), 400
+
+        # Update base parameters
         if I_c is not None:
             converter.I_c = float(I_c)
-        if r_jj is not None:
-            converter.r_jj = float(r_jj)
         if r_leak is not None:
             converter.r_leak = float(r_leak)
         if L is not None:
@@ -40,27 +43,44 @@ def update_constants():
         if beta_c is not None:
             converter.beta_c = float(beta_c)
 
-        # Recalculate derived quantities
-        converter.omega_c = converter.calculate_omega_c()
-        converter.alpha = converter.calculate_alpha()
-        converter.beta_L = converter.calculate_beta_L()
-        converter.gamma = converter.calculate_gamma()
-        converter.tau = converter.calculate_tau()
+        # Calculate derived parameters
+        c_j = converter.gamma_c * converter.I_c
+        
+        # Calculate r_jj using beta_c
+        r_jj = math.sqrt((converter.beta_c * converter.Phi_0) / (2 * math.pi * c_j * converter.I_c))
+        
+        # Update converter parameters
+        converter.c_j = c_j
+        converter.r_jj = r_jj
+        
+        # Calculate additional derived parameters
+        tau_0 = converter.Phi_0 / (2 * math.pi * converter.I_c * r_jj)
+        V_j = converter.I_c * r_jj
+        omega_c = (2 * math.pi * converter.I_c * r_jj) / converter.Phi_0
+        omega_p = math.sqrt((2 * math.pi * converter.I_c) / (converter.Phi_0 * c_j))
+        beta_L = (2 * math.pi * converter.I_c * converter.L) / converter.Phi_0
+        alpha = converter.r_leak / r_jj
+        gamma = 1 / beta_L if beta_L != 0 else float('inf')
+        tau = beta_L / alpha if alpha != 0 else float('inf')
 
         return jsonify({
             'I_c': converter.I_c,
-            'r_jj': converter.r_jj,
+            'r_jj': r_jj,
             'r_leak': converter.r_leak,
             'L': converter.L,
             'gamma_c': converter.gamma_c,
             'beta_c': converter.beta_c,
-            'omega_c': converter.omega_c,
-            'alpha': converter.alpha,
-            'beta_L': converter.beta_L,
-            'gamma': converter.gamma,
-            'tau': converter.tau
+            'c_j': c_j,
+            'tau_0': tau_0,
+            'V_j': V_j,
+            'omega_c': omega_c,
+            'omega_p': omega_p,
+            'beta_L': beta_L,
+            'alpha': alpha,
+            'gamma': gamma,
+            'tau': tau
         })
-    except (ValueError, TypeError) as e:
+    except (ValueError, TypeError, ZeroDivisionError) as e:
         return jsonify({'error': f'Invalid input values: {str(e)}'}), 400
 
 @app.route('/convert_to_physical', methods=['POST'])
@@ -105,3 +125,7 @@ def convert_to_dimensionless():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
+
+
+
