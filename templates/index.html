@@ -1,5 +1,4 @@
-<!-- templates/index.html -->
-
+<!-- FILEPATH: scr/soen/utils/physical_mappings/templates/index.html -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -83,7 +82,7 @@
                     <input id="G_fq" type="number" step="any">
                 </div>
                 <div class="input-group">
-                    <label for="L">Inductance (L) [H]</label>
+                    <label for="L">Physical Inductance (L) [H]</label>
                     <input id="L" type="number" step="any">
                 </div>
                 <button onclick="convertToDimensionless()" class="convert-dimensionless-btn">Convert to Dimensionless Units</button>
@@ -107,8 +106,14 @@
                         <p>\[t' = t \cdot \omega_c\]</p>
                         <p>\[g_{fq} = \frac{2\pi}{\omega_c} \cdot G_{fq}\]</p>
 
-                        <h3>Derived Quantities</h3>
+                        <h3>Derived Parameters</h3>
+                        <p>\[c_j = \gamma_c \cdot I_c\]</p>
+                        <p>\[r_{jj} = \sqrt{\frac{\beta_c \Phi_0}{2\pi c_j I_c}}\]</p>
+                        <p>\[\tau_0 = \frac{\Phi_0}{2\pi I_c r_{jj}}\]</p>
+                        <p>\[V_j = I_c r_{jj}\]</p>
                         <p>\[\omega_c = \frac{2\pi r_{jj} I_c}{\Phi_0}\]</p>
+                        <p>\[\omega_p = \sqrt{\frac{2\pi I_c}{\Phi_0 c_j}}\]</p>
+                        <p>\[\beta_L = \frac{2\pi I_c L}{\Phi_0}\]</p>
                         <p>\[\alpha = \frac{r_{leak}}{r_{jj}}\]</p>
                         <p>\[\gamma = \frac{1}{\beta_L}\]</p>
                         <p>\[\tau = \frac{\beta_L}{\alpha}\]</p>
@@ -121,40 +126,71 @@
                 <div id="constants-tab" class="tab-content">
                     <h2>Physical Constants</h2>
                     <div class="constants-grid">
-                        <div class="input-group">
-                            <label for="I_c">Critical Current (I_c) [A]</label>
-                            <input id="I_c" type="number" step="any" value="100e-6">
-                        </div>
-                        <div class="input-group">
-                            <label for="r_jj">Junction Shunt Resistance (r_{jj}) [Ω]</label>
-                            <input id="r_jj" type="number" step="any" value="2.56">
-                        </div>
-                        <div class="input-group">
-                            <label for="r_leak">Leak Resistance (r_{leak}) [Ω]</label>
-                            <input id="r_leak" type="number" step="any" value="1.0">
-                        </div>
-                        <div class="input-group">
-                            <label for="gamma_c">Proportionality Constant (γ_c) [F/A]</label>
-                            <input id="gamma_c" type="number" step="any" value="1.5e-9">
-                        </div>
-                        <div class="input-group">
-                            <label for="beta_c">Dimensionless Damping (β_c)</label>
-                            <input id="beta_c" type="number" step="any" value="1.0">
+                        <!-- Input Parameters -->
+                        <div class="input-parameters">
+                            <h3>Input Parameters</h3>
+                            <div class="input-group">
+                                <label for="I_c">Critical Current (I_c) [A]</label>
+                                <input id="I_c" type="number" step="any" value="100e-6">
+                            </div>
+                            <div class="input-group">
+                                <label for="r_leak">Leak Resistance (r_{leak}) [Ω]</label>
+                                <input id="r_leak" type="number" step="any" value="1.0">
+                            </div>
+                            <div class="input-group">
+                                <label for="L">Inductance (L) [H]</label>
+                                <input id="L" type="number" step="any" value="1e-9">
+                            </div>
+                            <div class="input-group">
+                                <label for="gamma_c">Proportionality Constant (γ_c) [F/A]</label>
+                                <input id="gamma_c" type="number" step="any" value="1.5e-9">
+                            </div>
+                            <div class="input-group">
+                                <label for="beta_c">Stewart-McCumber Parameter (β_c)</label>
+                                <input id="beta_c" type="number" step="any" value="0.3">
+                            </div>
                         </div>
                         
+                        <!-- Derived Constants -->
                         <div class="derived-constants">
                             <h3>Derived Constants</h3>
-                            <div class="constant-item">
-                                <span>ωc = </span><span id="omega_c"></span><span> rad/s</span>
+                            <div class="constant-group">
+                                <h4>Junction Parameters</h4>
+                                <div class="constant-item">
+                                    <span>c_j = </span><span id="c_j"></span><span> F</span>
+                                </div>
+                                <div class="constant-item">
+                                    <span>r_{jj} = </span><span id="r_jj"></span><span> Ω</span>
+                                </div>
+                                <div class="constant-item">
+                                    <span>V_j = </span><span id="V_j"></span><span> V</span>
+                                </div>
                             </div>
-                            <div class="constant-item">
-                                <span>α = </span><span id="alpha"></span>
+                            
+                            <div class="constant-group">
+                                <h4>Time Scales</h4>
+                                <div class="constant-item">
+                                    <span>τ_0 = </span><span id="tau_0"></span><span> s</span>
+                                </div>
+                                <div class="constant-item">
+                                    <span>ω_c = </span><span id="omega_c"></span><span> rad/s</span>
+                                </div>
+                                <div class="constant-item">
+                                    <span>ω_p = </span><span id="omega_p"></span><span> rad/s</span>
+                                </div>
                             </div>
-                            <div class="constant-item">
-                                <span>γ = </span><span id="gamma"></span>
-                            </div>
-                            <div class="constant-item">
-                                <span>τ = </span><span id="tau"></span>
+                            
+                            <div class="constant-group">
+                                <h4>Dimensionless Parameters</h4>
+                                <div class="constant-item">
+                                    <span>α = </span><span id="alpha"></span>
+                                </div>
+                                <div class="constant-item">
+                                    <span>γ = </span><span id="gamma"></span>
+                                </div>
+                                <div class="constant-item">
+                                    <span>τ = </span><span id="tau"></span>
+                                </div>
                             </div>
                         </div>
                         <button onclick="updateConstants()" class="update-constants-btn">Update Constants</button>
