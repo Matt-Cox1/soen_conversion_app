@@ -1,4 +1,4 @@
-<!-- FILEPATH: scr/soen/utils/physical_mappings/templates/index.html -->
+<!-- FILEPATH: src/soen/utils/physical_mappings/templates/index.html -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,181 +20,175 @@
         };
     </script>
 
-    <!-- Custom styles and scripts -->
+    <!-- Custom styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>SOEN Phenomenological Model Converter</h1>
-        <div class="converter-grid">
-            <!-- Dimensionless to Physical Section -->
-            <div class="converter-section">
-                <h2>Dimensionless to Physical</h2>
-                <div class="input-group">
-                    <label for="i">Dimensionless Current (i)</label>
-                    <input id="i" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="phi">Dimensionless Flux (φ)</label>
-                    <input id="phi" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="J">Dimensionless Inductance (J)</label>
-                    <input id="J" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="t_prime">Dimensionless Time (t')</label>
-                    <input id="t_prime" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="g_fq">Dimensionless Flux Quantum Rate (g_{fq})</label>
-                    <input id="g_fq" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="beta_L">Dimensionless Inductance (β_L)</label>
-                    <input id="beta_L" type="number" step="any">
-                </div>
-                <button onclick="convertToPhysical()" class="convert-physical-btn">Convert to Physical Units</button>
-                <div id="physicalResult" class="result"></div>
-            </div>
-
-            <!-- Physical to Dimensionless Section -->
-            <div class="converter-section">
-                <h2>Physical to Dimensionless</h2>
-                <div class="input-group">
-                    <label for="I">Physical Current (I) [A]</label>
-                    <input id="I" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="Phi">Physical Flux (Φ) [Wb]</label>
-                    <input id="Phi" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="M">Physical Mutual Inductance (M) [H]</label>
-                    <input id="M" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="t">Physical Time (t) [s]</label>
-                    <input id="t" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="G_fq">Physical Flux Quantum Rate (G_{fq}) [Hz]</label>
-                    <input id="G_fq" type="number" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="L">Physical Inductance (L) [H]</label>
-                    <input id="L" type="number" step="any">
-                </div>
-                <button onclick="convertToDimensionless()" class="convert-dimensionless-btn">Convert to Dimensionless Units</button>
-                <div id="dimensionlessResult" class="result"></div>
-            </div>
-
-            <!-- Constants and Equations Section -->
-            <div class="equations">
-                <div class="tab-container">
-                    <button class="tab-button active" onclick="switchTab('equations-tab')">Equations</button>
-                    <button class="tab-button" onclick="switchTab('constants-tab')">Constants</button>
-                </div>
-
-                <div id="equations-tab" class="tab-content active">
-                    <h2>Conversion Equations</h2>
-                    <div class="equations-content">
-                        <h3>Physical to Dimensionless</h3>
-                        <p>\[i = \frac{I}{I_c}\]</p>
-                        <p>\[\phi = \frac{\Phi}{\Phi_0}\]</p>
-                        <p>\[J = M \cdot \frac{I_c}{\Phi_0}\]</p>
-                        <p>\[t' = t \cdot \omega_c\]</p>
-                        <p>\[g_{fq} = \frac{2\pi}{\omega_c} \cdot G_{fq}\]</p>
-
-                        <h3>Derived Parameters</h3>
-                        <p>\[c_j = \gamma_c \cdot I_c\]</p>
-                        <p>\[r_{jj} = \sqrt{\frac{\beta_c \Phi_0}{2\pi c_j I_c}}\]</p>
-                        <p>\[\tau_0 = \frac{\Phi_0}{2\pi I_c r_{jj}}\]</p>
-                        <p>\[V_j = I_c r_{jj}\]</p>
-                        <p>\[\omega_c = \frac{2\pi r_{jj} I_c}{\Phi_0}\]</p>
-                        <p>\[\omega_p = \sqrt{\frac{2\pi I_c}{\Phi_0 c_j}}\]</p>
-                        <p>\[\beta_L = \frac{2\pi I_c L}{\Phi_0}\]</p>
-                        <p>\[\alpha = \frac{r_{leak}}{r_{jj}}\]</p>
-                        <p>\[\gamma = \frac{1}{\beta_L}\]</p>
-                        <p>\[\tau = \frac{\beta_L}{\alpha}\]</p>
-
-                        <h3>Fixed Constants</h3>
-                        <p>\[\Phi_0 = \frac{h}{2e} \approx 2.07 \times 10^{-15} \, \text{Wb}\]</p>
+        
+        <!-- Base Parameters Section -->
+        <section class="base-parameters">
+            <h2>Base Parameters</h2>
+            <div class="parameter-grid">
+                <!-- Input Parameters -->
+                <div class="input-parameters">
+                    <h3>Input Parameters</h3>
+                    <div class="input-group">
+                        <label for="I_c">Critical Current $(I_c)$ [A]</label>
+                        <input id="I_c" type="number" step="any" value="100e-6">
                     </div>
+                    <div class="input-group">
+                        <label for="gamma_c">Capacitance Proportionality $(\gamma_c)$ [F/A]</label>
+                        <input id="gamma_c" type="number" step="any" value="1.5e-9">
+                    </div>
+                    <div class="input-group">
+                        <label for="beta_c">Stewart-McCumber Parameter $(\beta_c)$</label>
+                        <input id="beta_c" type="number" step="any" value="0.3">
+                    </div>
+                    <button onclick="updateBaseParameters()" class="primary-button">Update Base Parameters</button>
                 </div>
 
-                <div id="constants-tab" class="tab-content">
-                    <h2>Physical Constants</h2>
-                    <div class="constants-grid">
-                        <!-- Input Parameters -->
-                        <div class="input-parameters">
-                            <h3>Input Parameters</h3>
-                            <div class="input-group">
-                                <label for="I_c">Critical Current (I_c) [A]</label>
-                                <input id="I_c" type="number" step="any" value="100e-6">
-                            </div>
-                            <div class="input-group">
-                                <label for="r_leak">Leak Resistance (r_{leak}) [Ω]</label>
-                                <input id="r_leak" type="number" step="any" value="1.0">
-                            </div>
-                            
-                            <div class="input-group">
-                                <label for="gamma_c">Proportionality Constant (γ_c) [F/A]</label>
-                                <input id="gamma_c" type="number" step="any" value="1.5e-9">
-                            </div>
-                            <div class="input-group">
-                                <label for="beta_c">Stewart-McCumber Parameter (β_c)</label>
-                                <input id="beta_c" type="number" step="any" value="0.3">
-                            </div>
+                <!-- Derived Physical Parameters -->
+                <div class="derived-parameters">
+                    <h3>Derived Parameters</h3>
+                    <div class="parameter-group">
+                        <div class="parameter-item">
+                            <span>Junction Capacitance:</span>
+                            <span id="c_j"></span>
+                            <span>[F]</span>
+                            <span class="equation">$c_j = \gamma_c I_c$</span>
                         </div>
-                        
-                        <!-- Derived Constants -->
-                        <div class="derived-constants">
-                            <h3>Derived Constants</h3>
-                            <div class="constant-group">
-                                <h4>Junction Parameters</h4>
-                                <div class="constant-item">
-                                    <span>c_j = </span><span id="c_j"></span><span> F</span>
-                                </div>
-                                <div class="constant-item">
-                                    <span>r_{jj} = </span><span id="r_jj"></span><span> Ω</span>
-                                </div>
-                                <div class="constant-item">
-                                    <span>V_j = </span><span id="V_j"></span><span> V</span>
-                                </div>
-                            </div>
-                            
-                            <div class="constant-group">
-                                <h4>Time Scales</h4>
-                                <div class="constant-item">
-                                    <span>τ_0 = </span><span id="tau_0"></span><span> s</span>
-                                </div>
-                                <div class="constant-item">
-                                    <span>ω_c = </span><span id="omega_c"></span><span> rad/s</span>
-                                </div>
-                                <div class="constant-item">
-                                    <span>ω_p = </span><span id="omega_p"></span><span> rad/s</span>
-                                </div>
-                            </div>
-                            
-                            <div class="constant-group">
-                                <h4>Dimensionless Parameters</h4>
-                                <div class="constant-item">
-                                    <span>α = </span><span id="alpha"></span>
-                                </div>
-                                <div class="constant-item">
-                                    <span>γ = </span><span id="gamma"></span>
-                                </div>
-                                <div class="constant-item">
-                                    <span>τ = </span><span id="tau"></span>
-                                </div>
-                            </div>
+                        <div class="parameter-item">
+                            <span>Junction Resistance:</span>
+                            <span id="r_jj"></span>
+                            <span>[Ω]</span>
+                            <span class="equation">$r_{jj} = \sqrt{\frac{\beta_c \Phi_0}{2\pi c_j I_c}}$</span>
                         </div>
-                        <button onclick="updateConstants()" class="update-constants-btn">Update Constants</button>
+                        <div class="parameter-item">
+                            <span>Junction Voltage:</span>
+                            <span id="V_j"></span>
+                            <span>[V]</span>
+                            <span class="equation">$V_j = I_c r_{jj}$</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span>Characteristic Time:</span>
+                            <span id="tau_0"></span>
+                            <span>[s]</span>
+                            <span class="equation">$\tau_0 = \frac{\Phi_0}{2\pi I_c r_{jj}}$</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span>Josephson Frequency:</span>
+                            <span id="omega_c"></span>
+                            <span>[rad/s]</span>
+                            <span class="equation">$\omega_c = \frac{2\pi I_c r_{jj}}{\Phi_0}$</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span>Plasma Frequency:</span>
+                            <span id="omega_p"></span>
+                            <span>[rad/s]</span>
+                            <span class="equation">$\omega_p = \sqrt{\frac{2\pi}{\Phi_0 \gamma_c}}$</span>
+                        </div>
+                        <div class="parameter-item">
+                            <span>Dimensionless Time Constant:</span>
+                            <span id="tau"></span>
+                            <span class="equation">$\tau = \frac{\beta_L}{\alpha}$</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Conversion Section -->
+        <section class="conversions">
+            <h2>Physical ↔ Dimensionless Conversions</h2>
+            <div class="conversion-grid">
+                <!-- Physical to Dimensionless -->
+                <div class="conversion-column">
+                    <h3>Physical to Dimensionless</h3>
+                    <div class="conversion-group">
+                        <div class="input-group">
+                            <label for="I">Current $(I)$ [A]</label>
+                            <input id="I" type="number" step="any">
+                            <span class="equation">$i = I/I_c$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="Phi">Flux $(\Phi)$ [Wb]</label>
+                            <input id="Phi" type="number" step="any">
+                            <span class="equation">$\phi = \Phi/\Phi_0$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="L">Inductance $(L)$ [H]</label>
+                            <input id="L" type="number" step="any">
+                            <span class="equation">$\beta_L = 2\pi I_c L/\Phi_0$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="t">Time $(t)$ [s]</label>
+                            <input id="t" type="number" step="any">
+                            <span class="equation">$t' = t\omega_c$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="r_leak">Leak Resistance $(r_{\text{leak}})$ [Ω]</label>
+                            <input id="r_leak" type="number" step="any">
+                            <span class="equation">$\alpha = r_{\text{leak}}/r_{jj}$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="G_fq">Flux Quantum Rate $(G_{fq})$ [Hz]</label>
+                            <input id="G_fq" type="number" step="any">
+                            <span class="equation">$g_{fq} = 2\pi G_{fq}/\omega_c$</span>
+                        </div>
+                        <button onclick="convertToDimensionless()" class="primary-button">Convert to Dimensionless</button>
+                        <div id="dimensionlessResult" class="result"></div>
+                    </div>
+                </div>
+
+                <!-- Dimensionless to Physical -->
+                <div class="conversion-column">
+                    <h3>Dimensionless to Physical</h3>
+                    <div class="conversion-group">
+                        <div class="input-group">
+                            <label for="i">Current $(i)$</label>
+                            <input id="i" type="number" step="any">
+                            <span class="equation">$I = iI_c$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="phi">Flux $(\phi)$</label>
+                            <input id="phi" type="number" step="any">
+                            <span class="equation">$\Phi = \phi\Phi_0$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="beta_L">Inductance $(\beta_L)$</label>
+                            <input id="beta_L" type="number" step="any">
+                            <span class="equation">$L = \beta_L\Phi_0/(2\pi I_c)$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="gamma">Inductance $(\gamma = 1/\beta_L)$</label>
+                            <input id="gamma" type="number" step="any">
+                            <span class="equation">$L = \Phi_0/(2\pi\gamma I_c)$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="t_prime">Time $(t')$</label>
+                            <input id="t_prime" type="number" step="any">
+                            <span class="equation">$t = t'/\omega_c$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="alpha">Resistance $(\alpha)$</label>
+                            <input id="alpha" type="number" step="any">
+                            <span class="equation">$r_{\text{leak}} = \alpha r_{jj}$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="g_fq">Flux Quantum Rate $(g_{fq})$</label>
+                            <input id="g_fq" type="number" step="any">
+                            <span class="equation">$G_{fq} = g_{fq}\omega_c/(2\pi)$</span>
+                        </div>
+                        <button onclick="convertToPhysical()" class="primary-button">Convert to Physical</button>
+                        <div id="physicalResult" class="result"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
     </div>
 
     <!-- Custom JavaScript -->
