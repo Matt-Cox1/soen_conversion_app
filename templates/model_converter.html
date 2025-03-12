@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOEN Model Converter</title>
+    
+    <!-- MathJax Configuration -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: ['base', 'ams', 'noerrors', 'noundefined']
+            }
+        };
+    </script>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .navbar {
+            background-color: #1565c0;
+            color: white;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+        }
+        .navbar-links a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">SOEN Tools</a>
+            <div class="navbar-links">
+                <a href="/">Parameter Converter</a>
+                <a href="/model_converter" class="active">Model Converter</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>SOEN Model Converter</h1>
+        
+        <section class="model-upload">
+            <h2>Upload Model</h2>
+            <div class="upload-area">
+                <p>Upload a saved SOEN model (.pth file) to convert dimensionless parameters to physical values.</p>
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="model-file" name="model_file" accept=".pth">
+                        <label for="model-file" class="file-input-label">Select Model File</label>
+                        <span id="file-name">No file selected</span>
+                    </div>
+                    
+                    <div class="parameter-inputs">
+                        <h3>Physical Base Parameters</h3>
+                        <div class="input-group">
+                            <label for="I_c">Critical Current $(I_c)$ [A]</label>
+                            <input id="I_c" name="I_c" type="number" step="any" value="100e-6">
+                        </div>
+                        <div class="input-group">
+                            <label for="gamma_c">Capacitance Proportionality $(\gamma_c)$ [F/A]</label>
+                            <input id="gamma_c" name="gamma_c" type="number" step="any" value="1.5e-9">
+                        </div>
+                        <div class="input-group">
+                            <label for="beta_c">Stewart-McCumber Parameter $(\beta_c)$</label>
+                            <input id="beta_c" name="beta_c" type="number" step="any" value="0.3">
+                        </div>
+                    </div>
+                    
+                 
+                    
+                    <div class="button-group">
+                        <button type="submit" id="convert-button" class="primary-button">Convert Model</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="upload-status" class="upload-status">
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <div id="status-message"></div>
+            </div>
+        </section>
+        
+        <section class="model-summary" id="model-summary-section" style="display: none;">
+            <h2>Model Summary</h2>
+            <div class="summary-details">
+                <div class="model-info">
+                    <h3>Model Information</h3>
+                    <table id="model-info-table" class="info-table">
+                        <tbody>
+                            <!-- Model info will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="parameter-summary">
+                    <h3>Base Physical Parameters</h3>
+                    <table id="physical-params-table" class="info-table">
+                        <tbody>
+                            <!-- Physical parameters will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                
+                
+                <div id="parameters-tab" class="tab-content active">
+                    <h3>Layer Parameters</h3>
+                    <div class="layer-selector">
+                        <label for="layer-select">Select Layer:</label>
+                        <select id="layer-select">
+                            <!-- Layer options will be populated here -->
+                        </select>
+                    </div>
+                    
+                    <div class="parameter-tables">
+                        <div id="layer-parameters" class="scrollable-table">
+                            <table id="layer-params-table" class="data-table">
+                                <thead>
+                                  <tr>
+                                    <th>Parameter</th>
+                                    <th>Min</th>
+                                    <th>Max</th>
+                                    <th>Mean</th>
+                                    <th>Std Dev</th> <!-- New column header for standard deviation -->
+                                    <th>Unit</th>
+                                  </tr>
+                                </thead>
+                                <tbody></tbody>
+                              </table>
+                        </div>
+                    </div>
+                    
+                    <h3>Connection Parameters</h3>
+                    <div class="connection-selector">
+                        <label for="connection-select">Select Connection:</label>
+                        <select id="connection-select">
+                            <!-- Connection options will be populated here -->
+                        </select>
+                    </div>
+                    
+                    <div class="parameter-tables">
+                        <div id="connection-parameters" class="scrollable-table">
+                            <table id="connection-params-table" class="data-table">
+                                <thead>
+                                  <tr>
+                                    <th>Parameter</th>
+                                    <th>Min</th>
+                                    <th>Max</th>
+                                    <th>Mean</th>
+                                    <th>Std Dev</th> <!-- New column header for standard deviation -->
+                                    <th>Sparsity</th>
+                                    <th>Unit</th>
+                                  </tr>
+                                </thead>
+                                <tbody></tbody>
+                              </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="plots-tab" class="tab-content">
+                    <!-- Plot content will be dynamically generated by JavaScript -->
+                </div>
+                
+                <div id="export-tab" class="tab-content">
+                    <h3>Export Converted Data</h3>
+                    <div class="export-options">
+                        <div class="export-group">
+                            <h4>Select Export Format</h4>
+                            <div class="radio-group">
+                                <input type="radio" id="export-csv" name="export-format" value="csv" checked>
+                                <label for="export-csv">CSV</label>
+                                
+                                <input type="radio" id="export-json" name="export-format" value="json">
+                                <label for="export-json">JSON</label>
+                            </div>
+                        </div>
+                        
+                        <div class="export-group">
+                            <h4>Select Data to Export</h4>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="export-summary" name="export-data" value="summary" checked>
+                                <label for="export-summary">Summary</label>
+                                
+                                <input type="checkbox" id="export-layers" name="export-data" value="layers" checked>
+                                <label for="export-layers">Layer Parameters</label>
+                                
+                                <input type="checkbox" id="export-connections" name="export-data" value="connections" checked>
+                                <label for="export-connections">Connection Parameters</label>
+                                
+                                <input type="checkbox" id="export-plots" name="export-data" value="plots">
+                                <label for="export-plots">Distribution Plots</label>
+                            </div>
+                        </div>
+                        
+                        <div class="export-actions">
+                            <button id="export-button" class="primary-button">Export Data</button>
+                            <div id="export-status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer Section -->
+        <footer class="page-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About SOEN Model Converter</h3>
+                    <p>This tool converts dimensionless SOEN model parameters to physical values based on user-provided base parameters.</p>
+                    <p>Use it to analyze trained models and understand the physical implementation requirements.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Tips</h3>
+                    <ul>
+                        <li>Upload a .pth model file saved from SOEN training</li>
+                        <li>Adjust base parameters based on your physical implementation</li>
+                        <li>Export data for further analysis or hardware design</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Great Sky Team</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/model_converter.js') }}"></script>
+</body>
+</html>

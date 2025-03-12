@@ -22,10 +22,69 @@
 
     <!-- Custom styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .navbar {
+            background-color: #1565c0;
+            color: white;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+        }
+        .navbar-links a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">SOEN Tools</a>
+            <div class="navbar-links">
+                <a href="/" class="active">Parameter Converter</a>
+                <a href="/model_converter">Model Converter</a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <h1>SOEN Phenomenological Model Converter</h1>
+        
+        <!-- Fundamental Constants Section -->
+        <section class="fundamental-constants">
+            <h2>Fundamental Constants</h2>
+            <div class="constants-grid" id="constants-container">
+                <!-- Constants will be populated via JavaScript -->
+            </div>
+        </section>
         
         <!-- Base Parameters Section -->
         <section class="base-parameters">
@@ -162,9 +221,9 @@
                             <span class="equation">$L = \beta_L\Phi_0/(2\pi I_c)$</span>
                         </div>
                         <div class="input-group">
-                            <label for="gamma">Inductance $(\gamma = 1/\beta_L)$</label>
-                            <input id="gamma" type="number" step="any">
-                            <span class="equation">$L = \Phi_0/(2\pi\gamma I_c)$</span>
+                            <label for="gamma_plus">Inductance $(\gamma_+ = 1/\beta_L)$</label>
+                            <input id="gamma_plus" type="number" step="any">
+                            <span class="equation">$L = \Phi_0/(2\pi\gamma_+ I_c)$</span>
                         </div>
                         <div class="input-group">
                             <label for="t_prime">Time $(t')$</label>
@@ -175,6 +234,11 @@
                             <label for="alpha">Resistance $(\alpha)$</label>
                             <input id="alpha" type="number" step="any">
                             <span class="equation">$r_{\text{leak}} = \alpha r_{jj}$</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="gamma_minus">Time Constant $(\gamma_- = \alpha/\beta_L = 1/\tau)$</label>
+                            <input id="gamma_minus" type="number" step="any">
+                            <span class="equation">$\tau = 1/\gamma_-$</span>
                         </div>
                         <div class="input-group">
                             <label for="g_fq">Flux Quantum Rate $(g_{fq})$</label>
@@ -189,6 +253,38 @@
         </section>
 
 
+        
+        <!-- Footer Section -->
+        <footer class="page-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About SOEN Simulator</h3>
+                    <p>This tool converts between physical and dimensionless quantities used in the SOEN Phenomenological Model.</p>
+                    <p>Use it to calculate parameters for your simulations and to understand the relationships between physical and model quantities.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Tips</h3>
+                    <ul>
+                        <li>Set base parameters first, then perform conversions</li>
+                        <li>All conversions use currently set base parameters</li>
+                        <li>Default values are for "typical" superconducting dendrites</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Reference</h3>
+                    <ul>
+                        <li>Φ₀ = Magnetic flux quantum (h/2e)</li>
+                        <li>i = I/Ic (normalized current)</li>
+                        <li>φ = Φ/Φ₀ (normalized flux)</li>
+                        <li>βL = 2πIcL/Φ₀ (normalized inductance)</li>
+                        <li>γ = 1/βL (alternative to βL)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Great Sky Team</p>
+            </div>
+        </footer>
     </div>
 
     <!-- Custom JavaScript -->
