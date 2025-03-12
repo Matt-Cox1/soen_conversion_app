@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from typing import Dict, Optional, List, Tuple, Union, Any
 import warnings
 
-from soen_sim_v2.utils.physical_mappings.soen_conversion_utils import PhysicalConverter
+from soen_conversion_utils import PhysicalConverter
 
 # Try to import pandas, but handle the case where it might not be available
 try:
