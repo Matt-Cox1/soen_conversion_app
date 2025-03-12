@@ -1,4 +1,4 @@
-# FILEPATH: src/soen/utils/physical_mappings/soen_conversion_utils.py
+# FILEPATH: src/soen_sim_v2/utils/physical_mappings/soen_conversion_utils.py
 
 import math
 from scipy.constants import h, e
@@ -16,6 +16,8 @@ class PhysicalConverter:
     
     # Fixed constant: Magnetic flux quantum in Weber
     Phi_0 = h / (2 * e)  # ~2.067833848e-15 Wb
+
+    
 
     def __init__(
         self,
@@ -195,6 +197,30 @@ class PhysicalConverter:
     def calculate_tau(self, beta_L: float, alpha: float) -> float:
         """τ = β_L/α"""
         return beta_L / alpha if alpha != 0 else float('inf')
+        
+    def gamma_plus_to_beta_L(self, gamma_plus: float) -> float:
+        """β_L = 1/γ_+"""
+        return self.gamma_to_beta_L(gamma_plus)  # Same conversion
+        
+    def beta_L_to_gamma_plus(self, beta_L: float) -> float:
+        """γ_+ = 1/β_L"""
+        return self.beta_L_to_gamma(beta_L)  # Same conversion
+        
+    def gamma_minus_to_tau(self, gamma_minus: float) -> float:
+        """τ = 1/γ_-"""
+        return 1.0 / gamma_minus if gamma_minus != 0 else float('inf')
+        
+    def tau_to_gamma_minus(self, tau: float) -> float:
+        """γ_- = 1/τ"""
+        return 1.0 / tau if tau != 0 else float('inf')
+        
+    def gamma_minus_to_alpha_beta_L(self, gamma_minus: float, beta_L: float) -> float:
+        """α = γ_- * β_L"""
+        return gamma_minus * beta_L
+    
+    def gamma_plus_gamma_minus_to_alpha(self, gamma_plus: float, gamma_minus: float) -> float:
+        """α = γ_- / γ_+"""
+        return gamma_minus / gamma_plus if gamma_plus != 0 else float('inf')
 
     def get_base_parameters(self) -> dict:
         """Return all base physical parameters"""
