@@ -23,9 +23,9 @@ import shutil
 # Add parent directory to path to ensure module can be imported
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from soen_sim_v2.utils.physical_mappings.model_converter import convert_model_to_physical
-from soen_sim_v2.utils.physical_mappings.model_converter import extract_param_df
-from soen_sim_v2.utils.physical_mappings.soen_conversion_utils import PhysicalConverter
+from model_converter import convert_model_to_physical
+from model_converter import extract_param_df
+from soen_conversion_utils import PhysicalConverter
 
 class ModelConverter:
     """
