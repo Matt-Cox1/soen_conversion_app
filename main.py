@@ -16,8 +16,8 @@ src_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
 if src_dir not in sys.path:
     sys.path.insert(0, src_dir)
 
-from soen_sim_v2.utils.physical_mappings.soen_conversion_utils import PhysicalConverter
-from soen_sim_v2.utils.physical_mappings.convert_model import ModelConverter
+from soen_conversion_utils import PhysicalConverter
+from convert_model import ModelConverter
 
 app = Flask(__name__)
 converter = PhysicalConverter()
